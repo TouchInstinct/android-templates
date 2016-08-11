@@ -2,8 +2,8 @@ apply plugin: 'com.android.library'
 apply plugin: 'me.tatarka.retrolambda'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+    compileSdkVersion 24
+    buildToolsVersion "24.0.1"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -12,13 +12,14 @@ android {
 
     defaultConfig {
         minSdkVersion 9
-        targetSdkVersion 23
+        targetSdkVersion 24
     }
 }
 
 dependencies {
     compile project(path: ':libraries:components')
 
+    provided 'io.reactivex:rxandroid:1.2.1'
     provided 'com.squareup.retrofit2:retrofit:2.1.0'
     provided 'com.squareup.okhttp:okhttp:2.7.5'
     provided('com.google.http-client:google-http-client-jackson2:1.21.0') {
