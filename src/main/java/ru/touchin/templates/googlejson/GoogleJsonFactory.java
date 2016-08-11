@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.net.SocketException;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -68,14 +69,17 @@ public class GoogleJsonFactory extends Converter.Factory {
             this.type = type;
         }
 
-        @SuppressWarnings("unchecked")
+
+        @SuppressWarnings({"unchecked", "PMD.AvoidInstanceofChecksInCatchClause"})
+        //AvoidInstanceofChecksInCatchClause: we just don't need assertion on specific exceptions
+        @NonNull
         @Override
-        public T convert(final ResponseBody value) throws IOException {
+        public T convert(@NonNull final ResponseBody value) throws IOException {
             final T result;
             try {
                 result = (T) GoogleJsonModel.DEFAULT_JSON_FACTORY.createJsonParser(value.charStream()).parse(type, true);
             } catch (final IOException exception) {
-                if (!(exception instanceof InterruptedIOException)) {
+                if (!(exception instanceof SocketException) && !(exception instanceof InterruptedIOException)) {
                     Lc.assertion(exception);
                 }
                 throw exception;
@@ -99,6 +103,7 @@ public class GoogleJsonFactory extends Converter.Factory {
 
         private static final MediaType MEDIA_TYPE = MediaType.parse("application/json; charset=UTF-8");
 
+        @NonNull
         @Override
         public RequestBody convert(@NonNull final T value) throws IOException {
             final AbstractHttpContent content = new JsonHttpContent(GoogleJsonModel.DEFAULT_JSON_FACTORY, value);

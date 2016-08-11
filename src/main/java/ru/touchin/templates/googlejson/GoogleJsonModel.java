@@ -19,16 +19,11 @@
 
 package ru.touchin.templates.googlejson;
 
-import android.support.annotation.CallSuper;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.Data;
-
-import java.io.IOException;
-import java.util.List;
 
 import ru.touchin.templates.ApiModel;
 
@@ -109,6 +104,10 @@ public abstract class GoogleJsonModel extends ApiModel {
         if (isNull(object)) {
             throw new ValidationException("Not null or not missed object is null");
         }
+    }
+
+    protected GoogleJsonModel() {
+        super();
     }
 
 }

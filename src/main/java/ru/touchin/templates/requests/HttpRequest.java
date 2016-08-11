@@ -156,7 +156,8 @@ public abstract class HttpRequest<T> {
     protected abstract T parse(@NonNull final Class<T> responseResultType, @NonNull final Charset charset, @NonNull final InputStream inputStream)
             throws IOException;
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked","PMD.NPathComplexity"})
+    //TODO: NPathComplexity
     @NonNull
     private T executeSyncInternal(@NonNull final RequestController requestController) throws IOException {
         final boolean shouldLog = Lc.getLogProcessor().getMinLogLevel().lessThan(LcLevel.INFO);

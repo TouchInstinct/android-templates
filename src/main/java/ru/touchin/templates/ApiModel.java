@@ -41,10 +41,12 @@ public abstract class ApiModel {
      * @param collectionValidationRule Rule explaining what to do if invalid items found;
      * @throws ValidationException Exception of validation.
      */
+    @SuppressWarnings("PMD.PreserveStackTrace")
+    // PreserveStackTrace: it's ok - we are logging it on Lc.e()
     protected static void validateCollection(@NonNull final Collection collection, @NonNull final CollectionValidationRule collectionValidationRule)
             throws ValidationException {
         boolean haveValidItem = false;
-        int i = 0;
+        int position = 0;
         final Iterator iterator = collection.iterator();
         while (iterator.hasNext()) {
             final Object item = iterator.next();
@@ -61,19 +63,21 @@ public abstract class ApiModel {
                         throw exception;
                     case EXCEPTION_IF_ALL_INVALID:
                         iterator.remove();
-                        Lc.e(exception, "Item %s is invalid", i);
+                        Lc.e(exception, "Item %s is invalid", position);
                         if (!iterator.hasNext() && !haveValidItem) {
                             throw new ValidationException("Whole list is invalid");
                         }
+                        break;
                     case REMOVE_INVALID_ITEMS:
                         iterator.remove();
-                        Lc.e(exception, "Item %s is invalid", i);
+                        Lc.e(exception, "Item %s is invalid", position);
                         break;
                     default:
                         Lc.assertion("Unexpected rule " + collectionValidationRule);
+                        break;
                 }
             }
-            i++;
+            position++;
         }
     }
 
