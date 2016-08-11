@@ -44,6 +44,7 @@ public abstract class ApiModel {
     protected static void validateCollection(@NonNull final Collection collection, @NonNull final CollectionValidationRule collectionValidationRule)
             throws ValidationException {
         boolean haveValidItem = false;
+        int i = 0;
         final Iterator iterator = collection.iterator();
         while (iterator.hasNext()) {
             final Object item = iterator.next();
@@ -60,18 +61,19 @@ public abstract class ApiModel {
                         throw exception;
                     case EXCEPTION_IF_ALL_INVALID:
                         iterator.remove();
-                        Lc.assertion(exception);
+                        Lc.e(exception, "Item %s is invalid", i);
                         if (!iterator.hasNext() && !haveValidItem) {
                             throw new ValidationException("Whole list is invalid");
                         }
                     case REMOVE_INVALID_ITEMS:
                         iterator.remove();
-                        Lc.assertion(exception);
+                        Lc.e(exception, "Item %s is invalid", i);
                         break;
                     default:
                         Lc.assertion("Unexpected rule " + collectionValidationRule);
                 }
             }
+            i++;
         }
     }
 

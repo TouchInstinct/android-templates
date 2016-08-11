@@ -59,7 +59,7 @@ public class GoogleJsonFactory extends Converter.Factory {
         return new GoogleJsonRequestBodyConverter<>();
     }
 
-    private static class GoogleJsonResponseBodyConverter<T> implements Converter<ResponseBody, T> {
+    public static class GoogleJsonResponseBodyConverter<T> implements Converter<ResponseBody, T> {
 
         @NonNull
         private final Type type;
@@ -95,7 +95,7 @@ public class GoogleJsonFactory extends Converter.Factory {
 
     }
 
-    private static class GoogleJsonRequestBodyConverter<T> implements Converter<T, RequestBody> {
+    public static class GoogleJsonRequestBodyConverter<T> implements Converter<T, RequestBody> {
 
         private static final MediaType MEDIA_TYPE = MediaType.parse("application/json; charset=UTF-8");
 
