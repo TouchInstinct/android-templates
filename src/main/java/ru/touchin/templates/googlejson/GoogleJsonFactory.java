@@ -69,7 +69,6 @@ public class GoogleJsonFactory extends Converter.Factory {
             this.type = type;
         }
 
-
         @SuppressWarnings({"unchecked", "PMD.AvoidInstanceofChecksInCatchClause"})
         //AvoidInstanceofChecksInCatchClause: we just don't need assertion on specific exceptions
         @NonNull
