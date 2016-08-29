@@ -61,7 +61,7 @@ public class GoogleJsonPreferences {
                 .build();
     }
 
-    private static class JsonConverter<TJsonObject> implements SafeConverter<TJsonObject, String> {
+    public static class JsonConverter<TJsonObject> implements SafeConverter<TJsonObject, String> {
 
         @Nullable
         @Override
