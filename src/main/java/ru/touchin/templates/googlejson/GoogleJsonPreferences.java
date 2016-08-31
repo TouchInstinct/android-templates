@@ -28,12 +28,12 @@ import com.google.api.client.http.json.JsonHttpContent;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import ru.touchin.roboswag.components.utils.storables.PreferenceStore;
 import ru.touchin.roboswag.core.observables.storable.SafeConverter;
 import ru.touchin.roboswag.core.observables.storable.Storable;
 import ru.touchin.roboswag.core.observables.storable.concrete.NonNullSafeStorable;
 import ru.touchin.roboswag.core.observables.storable.concrete.SafeStorable;
 import ru.touchin.roboswag.core.utils.ShouldNotHappenException;
-import ru.touchin.templates.StringPreferenceStore;
 
 /**
  * Created by Gavriil Sitnikov on 23/08/2016.
@@ -46,7 +46,7 @@ public class GoogleJsonPreferences {
                                                                    @NonNull final Class<T> jsonClass,
                                                                    @NonNull final SharedPreferences preferences) {
         return new Storable.Builder<String, T, String>(name, jsonClass, Storable.ObserveStrategy.CACHE_STORE_VALUE)
-                .setSafeStore(String.class, new StringPreferenceStore(preferences), new JsonConverter<>())
+                .setSafeStore(String.class, new PreferenceStore<>(preferences), new JsonConverter<>())
                 .build();
     }
 
@@ -56,7 +56,7 @@ public class GoogleJsonPreferences {
                                                                           @NonNull final SharedPreferences preferences,
                                                                           final T defaultValue) {
         return new Storable.Builder<String, T, String>(name, jsonClass, Storable.ObserveStrategy.CACHE_ACTUAL_VALUE)
-                .setSafeStore(String.class, new StringPreferenceStore(preferences), new JsonConverter<>())
+                .setSafeStore(String.class, new PreferenceStore<>(preferences), new JsonConverter<>())
                 .setDefaultValue(defaultValue)
                 .build();
     }
