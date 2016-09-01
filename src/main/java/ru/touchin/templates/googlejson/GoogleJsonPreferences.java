@@ -37,7 +37,7 @@ import ru.touchin.roboswag.core.utils.ShouldNotHappenException;
 
 /**
  * Created by Gavriil Sitnikov on 23/08/2016.
- * TODO
+ * Utility class to get {@link Storable} that is storing Google Json generated object into prefernces.
  */
 public class GoogleJsonPreferences {
 
