@@ -26,6 +26,8 @@ import com.tozny.crypto.android.AesCbcWithIntegrity;
 import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
 
+import ru.touchin.roboswag.core.utils.ShouldNotHappenException;
+
 /**
  * Created by Gavriil Sitnikov on 30/08/2016.
  * Utility class that is providing common methods related to cryptography.
@@ -48,7 +50,7 @@ public final class CryptoUtils {
             final AesCbcWithIntegrity.CipherTextIvMac cipherTextIvMac = AesCbcWithIntegrity.encrypt(bytesToDecrypt, key);
             return cipherTextIvMac.toString().getBytes(Charset.forName("UTF-8"));
         } catch (final GeneralSecurityException exception) {
-            throw new RuntimeException(exception);
+            throw new ShouldNotHappenException(exception);
         }
     }
 
@@ -68,7 +70,7 @@ public final class CryptoUtils {
                     = new AesCbcWithIntegrity.CipherTextIvMac(new String(encryptedBytes, Charset.forName("UTF-8")));
             return AesCbcWithIntegrity.decrypt(cipherTextIvMac, key);
         } catch (final GeneralSecurityException exception) {
-            throw new RuntimeException(exception);
+            throw new ShouldNotHappenException(exception);
         }
     }
 

@@ -39,7 +39,7 @@ import ru.touchin.roboswag.core.utils.ShouldNotHappenException;
  * Created by Gavriil Sitnikov on 23/08/2016.
  * Utility class to get {@link Storable} that is storing Google Json generated object into prefernces.
  */
-public class GoogleJsonPreferences {
+public final class GoogleJsonPreferences {
 
     @NonNull
     public static <T> SafeStorable<String, T, String> jsonStorable(@NonNull final String name,
@@ -61,11 +61,14 @@ public class GoogleJsonPreferences {
                 .build();
     }
 
+    private GoogleJsonPreferences() {
+    }
+
     public static class JsonConverter<TJsonObject> implements SafeConverter<TJsonObject, String> {
 
         @Nullable
         @Override
-        public String toStoreObject(@NonNull final Class<TJsonObject> tJsonObjectClass, @NonNull final Class<String> stringClass,
+        public String toStoreObject(@NonNull final Class<TJsonObject> jsonObjectClass, @NonNull final Class<String> stringClass,
                                     @Nullable final TJsonObject object) {
             if (object == null) {
                 return null;
