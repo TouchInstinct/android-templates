@@ -23,10 +23,19 @@ import android.support.annotation.NonNull;
 
 /**
  * Created by Gavriil Sitnikov on 29/02/16.
- * TODO: description
+ * Interface to implement for objects which could handle message coming from socket.
+ *
+ * @param <TMessage> Type of message coming from socket.
  */
-public interface SocketMessageHandler<T> {
+public interface SocketMessageHandler<TMessage> {
 
-    T handleMessage(@NonNull T message) throws Exception;
+    /**
+     * Method to handle message
+     *
+     * @param message Message to handle;
+     * @return Result of handling message;
+     * @throws Exception Throws during handling.
+     */
+    TMessage handleMessage(@NonNull TMessage message) throws Exception;
 
 }

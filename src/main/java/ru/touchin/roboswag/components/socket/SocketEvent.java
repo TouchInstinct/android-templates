@@ -22,57 +22,80 @@ package ru.touchin.roboswag.components.socket;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.jackson2.JacksonFactory;
-
-import java.io.StringReader;
+import java.io.IOException;
 
 /**
- * Created by Ilia Kurtov on 22.01.2016.
+ * Created by Gavriil Sitnikov on 29/02/16.
+ * Object that represents event on socket connection by name (e.g. messages/get).
+ *
+ * @param <TMessage> Type of message coming from socket by event.
  */
-public class SocketEvent<T> {
-
-    private static final JsonFactory DEFAULT_JSON_FACTORY = new JacksonFactory();
+public abstract class SocketEvent<TMessage> {
 
     @NonNull
     private final String name;
     @NonNull
-    private final Class<T> clz;
+    private final Class<TMessage> messageClass;
     @Nullable
-    private final SocketMessageHandler<T> eventDataHandler;
+    private final SocketMessageHandler<TMessage> eventDataHandler;
 
-    public SocketEvent(@NonNull final String name, @NonNull final Class<T> clz, @Nullable final SocketMessageHandler<T> eventDataHandler) {
+    public SocketEvent(@NonNull final String name, @NonNull final Class<TMessage> messageClass,
+                       @Nullable final SocketMessageHandler<TMessage> eventDataHandler) {
         this.name = name;
-        this.clz = clz;
+        this.messageClass = messageClass;
         this.eventDataHandler = eventDataHandler;
     }
 
+    /**
+     * Returns name of event.
+     *
+     * @return Name of event.
+     */
     @NonNull
     public String getName() {
         return name;
     }
 
+    /**
+     * Returns message class;
+     *
+     * @return message class.
+     */
+    @NonNull
+    public Class<TMessage> getMessageClass() {
+        return messageClass;
+    }
+
+    /**
+     * Returns handler to handle message after response and parsing.
+     *
+     * @return Message handler.
+     */
     @Nullable
-    public SocketMessageHandler<T> getEventDataHandler() {
+    public SocketMessageHandler<TMessage> getEventDataHandler() {
         return eventDataHandler;
     }
 
+    /**
+     * Parses input string to message.
+     *
+     * @param source Input string;
+     * @return Message object;
+     * @throws IOException Exception during parsing.
+     */
     @NonNull
-    public T parse(@NonNull final String source) throws Exception {
-        return DEFAULT_JSON_FACTORY.createJsonObjectParser().parseAndClose(new StringReader(source), clz);
-    }
+    public abstract TMessage parse(@NonNull final String source) throws IOException;
 
     @Override
     public boolean equals(final Object object) {
         return object instanceof SocketEvent
                 && ((SocketEvent) object).name.equals(name)
-                && ((SocketEvent) object).clz.equals(clz)
-                && ((SocketEvent) object).eventDataHandler == eventDataHandler;
+                && ((SocketEvent) object).messageClass.equals(messageClass);
     }
 
     @Override
     public int hashCode() {
-        return name.hashCode() + clz.hashCode();
+        return name.hashCode() + messageClass.hashCode();
     }
 
 }

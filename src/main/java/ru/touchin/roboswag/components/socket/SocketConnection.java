@@ -20,7 +20,7 @@
 package ru.touchin.roboswag.components.socket;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.support.v4.util.Pair;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -35,7 +35,7 @@ import ru.touchin.templates.ApiModel;
 import rx.Observable;
 import rx.Scheduler;
 import rx.functions.Action1;
-import rx.subjects.BehaviorSubject;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by Gavriil Sitnikov on 29/02/16.
@@ -43,93 +43,124 @@ import rx.subjects.BehaviorSubject;
  */
 public abstract class SocketConnection {
 
-    private final BehaviorSubject<State> stateSubject = BehaviorSubject.create(State.DISCONNECTED);
+    @NonNull
     private final Scheduler scheduler = RxAndroidUtils.createLooperScheduler();
+    @NonNull
     private final Map<SocketEvent, Observable> messagesObservableCache = new HashMap<>();
-
-    @Nullable
-    private Observable<Socket> socketObservable;
+    @NonNull
+    private final Observable<Pair<Socket, State>> socketObservable = createSocketObservable();
+    private final boolean autoConnectOnAnySubscription;
 
     @NonNull
     public Scheduler getScheduler() {
         return scheduler;
     }
 
-    protected Observable<Socket> getSocket() {
-        synchronized (scheduler) {
-            if (socketObservable == null) {
-                socketObservable = createSocketObservable();
-            }
-        }
-        return socketObservable;
+    public SocketConnection(final boolean autoConnectOnAnySubscription) {
+        this.autoConnectOnAnySubscription = autoConnectOnAnySubscription;
     }
 
+    /**
+     * Returns {@link Observable} that creates socket connection and connects/disconnects by subscription state.
+     *
+     * @return Socket {@link Observable}.
+     */
+    @NonNull
+    protected Observable<Socket> getSocket() {
+        return socketObservable
+                .map(pair -> pair.first)
+                .distinctUntilChanged();
+    }
+
+    /**
+     * Creates socket.
+     *
+     * @return New socket.
+     * @throws Exception Exception throwing during socket creation.
+     */
+    @NonNull
     protected abstract Socket createSocket() throws Exception;
 
-    private Observable<Socket> createSocketObservable() {
+    @NonNull
+    private Observable<Pair<Socket, State>> createSocketObservable() {
         return Observable
                 .<Socket>create(subscriber -> {
                     try {
                         final Socket socket = createSocket();
-                        socket.on(Socket.EVENT_CONNECT, args -> changeSocketState(State.CONNECTED));
-                        socket.on(Socket.EVENT_CONNECTING, args -> changeSocketState(State.CONNECTING));
-                        socket.on(Socket.EVENT_CONNECT_ERROR, args -> changeSocketState(State.CONNECTION_ERROR));
-                        socket.on(Socket.EVENT_CONNECT_TIMEOUT, args -> changeSocketState(State.CONNECTION_ERROR));
-                        socket.on(Socket.EVENT_DISCONNECT, args -> changeSocketState(State.DISCONNECTED));
-                        socket.on(Socket.EVENT_RECONNECT_ATTEMPT, args -> changeSocketState(State.CONNECTING));
-                        socket.on(Socket.EVENT_RECONNECTING, args -> changeSocketState(State.CONNECTING));
-                        socket.on(Socket.EVENT_RECONNECT, args -> changeSocketState(State.CONNECTED));
-                        socket.on(Socket.EVENT_RECONNECT_ERROR, args -> changeSocketState(State.CONNECTION_ERROR));
-                        socket.on(Socket.EVENT_RECONNECT_FAILED, args -> changeSocketState(State.CONNECTION_ERROR));
                         subscriber.onNext(socket);
                     } catch (final Exception exception) {
                         Lc.assertion(exception);
                     }
                     subscriber.onCompleted();
                 })
-                .subscribeOn(scheduler)
                 .switchMap(socket -> Observable
-                        .<Socket>create(subscriber -> subscriber.onNext(socket))
+                        .<Pair<Socket, State>>create(subscriber -> {
+                            socket.on(Socket.EVENT_CONNECT, args -> subscriber.onNext(new Pair<>(socket, State.CONNECTED)));
+                            socket.on(Socket.EVENT_CONNECTING, args -> subscriber.onNext(new Pair<>(socket, State.CONNECTING)));
+                            socket.on(Socket.EVENT_CONNECT_ERROR, args -> subscriber.onNext(new Pair<>(socket, State.CONNECTION_ERROR)));
+                            socket.on(Socket.EVENT_CONNECT_TIMEOUT, args -> subscriber.onNext(new Pair<>(socket, State.CONNECTION_ERROR)));
+                            socket.on(Socket.EVENT_DISCONNECT, args -> subscriber.onNext(new Pair<>(socket, State.DISCONNECTED)));
+                            socket.on(Socket.EVENT_RECONNECT_ATTEMPT, args -> subscriber.onNext(new Pair<>(socket, State.CONNECTING)));
+                            socket.on(Socket.EVENT_RECONNECTING, args -> subscriber.onNext(new Pair<>(socket, State.CONNECTING)));
+                            socket.on(Socket.EVENT_RECONNECT, args -> subscriber.onNext(new Pair<>(socket, State.CONNECTED)));
+                            socket.on(Socket.EVENT_RECONNECT_ERROR, args -> subscriber.onNext(new Pair<>(socket, State.CONNECTION_ERROR)));
+                            socket.on(Socket.EVENT_RECONNECT_FAILED, args -> subscriber.onNext(new Pair<>(socket, State.CONNECTION_ERROR)));
+                            subscriber.onNext(new Pair<>(socket, State.DISCONNECTED));
+                        })
                         .doOnSubscribe(() -> {
-                            Lc.d("Socket connection requested");
-                            socket.connect();
+                            if (autoConnectOnAnySubscription) {
+                                socket.connect();
+                            }
                         })
                         .doOnUnsubscribe(() -> {
-                            Lc.d("Socket disconnection requested");
-                            socket.disconnect();
+                            if (autoConnectOnAnySubscription) {
+                                socket.disconnect();
+                            }
                         }))
+                .subscribeOn(scheduler)
                 .replay(1)
                 .refCount();
     }
 
-    private void changeSocketState(@NonNull final State state) {
-        stateSubject.onNext(state);
-        Lc.d("Socket state changed: %s", state);
+    /**
+     * Returns {@link Observable} to observe socket state.
+     *
+     * @return {@link Observable} to observe socket state.
+     */
+    @NonNull
+    public Observable<State> observeSocketState() {
+        return socketObservable.map(pair -> pair.second);
     }
 
     @SuppressWarnings("unchecked")
+    //unchecked: it's OK as we are caching raw observables
     protected <T> Observable<T> observeEvent(@NonNull final SocketEvent<T> socketEvent) {
-        Observable result;
-        synchronized (scheduler) {
-            result = messagesObservableCache.get(socketEvent);
-            if (result == null) {
-                result = getSocket()
-                        .switchMap(socket -> Observable
-                                .<T>create(subscriber -> socket.on(socketEvent.getName(),
-                                        new SocketListener<>(socketEvent, subscriber::onNext)))
-                                .doOnUnsubscribe(() -> socket.off(socketEvent.getName())))
-                        .replay(1)
-                        .refCount();
-                messagesObservableCache.put(socketEvent, result);
-            }
-        }
-        return result;
+        return Observable.switchOnNext(Observable
+                .<Observable<T>>create(observableSubscriber -> {
+                    Observable<T> result = (Observable<T>) messagesObservableCache.get(socketEvent);
+                    if (result == null) {
+                        result = getSocket()
+                                .switchMap(socket -> Observable
+                                        .<T>create(subscriber ->
+                                                socket.on(socketEvent.getName(), new SocketListener<>(socketEvent, subscriber::onNext)))
+                                        .unsubscribeOn(scheduler)
+                                        .doOnUnsubscribe(() -> {
+                                            socket.off(socketEvent.getName());
+                                            messagesObservableCache.remove(socketEvent);
+                                        }))
+                                .replay(1)
+                                .refCount();
+                    }
+                    observableSubscriber.onNext(result);
+                    observableSubscriber.onCompleted();
+                })
+                .subscribeOn(scheduler)
+                .observeOn(Schedulers.computation()));
     }
 
-    public Observable<State> observeSocketState() {
-        return stateSubject.distinctUntilChanged();
-    }
-
+    /**
+     * State of socket connection.
+     */
     public enum State {
         DISCONNECTED,
         CONNECTING,
@@ -137,41 +168,42 @@ public abstract class SocketConnection {
         CONNECTION_ERROR
     }
 
-    public static class SocketListener<T> implements Emitter.Listener {
+    /**
+     * Interface to listen socket messages.
+     *
+     * @param <TMessage> Type of socket message.
+     */
+    public static class SocketListener<TMessage> implements Emitter.Listener {
 
         @NonNull
-        private final SocketEvent<T> socketEvent;
+        private final SocketEvent<TMessage> socketEvent;
         @NonNull
-        private final Action1<T> action;
+        private final Action1<TMessage> onMessageAction;
 
-        public SocketListener(@NonNull final SocketEvent<T> socketEvent,
-                              @NonNull final Action1<T> action) {
+        public SocketListener(@NonNull final SocketEvent<TMessage> socketEvent, @NonNull final Action1<TMessage> onMessageAction) {
             this.socketEvent = socketEvent;
-            this.action = action;
+            this.onMessageAction = onMessageAction;
         }
 
-        @SuppressWarnings("PMD.AvoidInstanceofChecksInCatchClause")
-        //TODO
         @Override
         public void call(final Object... args) {
+            if (args == null || args[0] == null) {
+                return;
+            }
             try {
-                if (args != null) {
-                    final String response = args[0].toString();
-                    Lc.d("Got socket message: %s", response);
-                    final T message = socketEvent.parse(response);
-                    if (socketEvent.getEventDataHandler() != null) {
-                        socketEvent.getEventDataHandler().handleMessage(message);
-                    }
-                    action.call(message);
+                final String response = args[0].toString();
+                final TMessage message = socketEvent.parse(response);
+                if (socketEvent.getEventDataHandler() != null) {
+                    socketEvent.getEventDataHandler().handleMessage(message);
                 }
+                onMessageAction.call(message);
             } catch (final RuntimeException throwable) {
                 Lc.assertion(throwable);
             } catch (final JsonProcessingException exception) {
                 Lc.assertion(exception);
+            } catch (final ApiModel.ValidationException exception) {
+                Lc.assertion(exception);
             } catch (final Exception exception) {
-                if (exception instanceof ApiModel.ValidationException) {
-                    Lc.assertion(exception);
-                }
                 Lc.e(exception, "Socket processing error");
             }
         }
