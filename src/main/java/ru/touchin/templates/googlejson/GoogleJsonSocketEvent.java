@@ -24,8 +24,8 @@ import android.support.annotation.Nullable;
 
 import java.io.IOException;
 
-import ru.touchin.roboswag.components.socket.SocketEvent;
-import ru.touchin.roboswag.components.socket.SocketMessageHandler;
+import ru.touchin.templates.socket.SocketEvent;
+import ru.touchin.templates.socket.SocketMessageHandler;
 import ru.touchin.templates.ApiModel;
 
 /**

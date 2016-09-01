@@ -17,7 +17,7 @@
  *
  */
 
-package ru.touchin.roboswag.components.socket;
+package ru.touchin.templates.socket;
 
 import android.support.annotation.NonNull;
 
