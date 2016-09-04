@@ -16,22 +16,32 @@ android {
     }
 }
 
+repositories {
+    maven { url 'https://maven.fabric.io/public' }
+}
+
 dependencies {
     compile project(path: ':libraries:components')
 
     provided 'com.android.support:appcompat-v7:24.2.0'
+    provided 'com.android.support:multidex:1.0.1'
 
+    provided 'net.danlew:android.joda:2.9.3'
     provided 'io.reactivex:rxandroid:1.2.1'
 
     provided 'com.squareup.retrofit2:retrofit:2.1.0'
     provided 'com.squareup.okhttp:okhttp:2.7.5'
-    provided ('com.google.http-client:google-http-client-jackson2:1.22.0') {
+    provided('com.google.http-client:google-http-client-jackson2:1.22.0') {
         exclude(group: 'org.apache.httpcomponents', module: 'httpclient')
     }
 
     provided 'com.scottyab:aes-crypto:0.0.4'
 
-    provided ('io.socket:socket.io-client:0.7.0') {
+    provided('io.socket:socket.io-client:0.7.0') {
         exclude group: 'org.json', module: 'json'
+    }
+
+    provided('com.crashlytics.sdk.android:crashlytics:2.6.2@aar') {
+        transitive = true;
     }
 }
