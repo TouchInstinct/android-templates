@@ -39,7 +39,7 @@ import rx.schedulers.Schedulers;
 
 /**
  * Created by Gavriil Sitnikov on 29/02/16.
- * TODO: description
+ * Base class to realize socket.io logic into your project.
  */
 public abstract class SocketConnection {
 
