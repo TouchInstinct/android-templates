@@ -35,7 +35,6 @@ import ru.touchin.roboswag.components.utils.Logic;
 
 /**
  * Created by Gavriil Sitnikov on 11/03/16.
-<<<<<<< HEAD
  * Base class of activity to extends for Touch Instinct related projects.
  *
  * @param <TLogic> Type of application's {@link Logic}.
