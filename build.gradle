@@ -29,7 +29,7 @@ dependencies {
         transitive = true;
     }
 
-    provided 'com.android.support:appcompat-v7:24.2.0'
+    provided "com.android.support:appcompat-v7:$rootProject.ext.supportLibraryVersion"
 
     provided 'net.danlew:android.joda:2.9.3'
     provided 'io.reactivex:rxandroid:1.2.1'
