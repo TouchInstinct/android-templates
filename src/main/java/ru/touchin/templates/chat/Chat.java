@@ -27,7 +27,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import ru.touchin.roboswag.core.log.Lc;
 import ru.touchin.roboswag.core.observables.RxAndroidUtils;
 import rx.Observable;
 import rx.Scheduler;
