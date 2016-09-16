@@ -25,7 +25,9 @@ import android.support.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import ru.touchin.roboswag.core.log.Lc;
 import ru.touchin.roboswag.core.observables.RxAndroidUtils;
 import rx.Observable;
 import rx.Scheduler;
@@ -36,6 +38,8 @@ import rx.subjects.PublishSubject;
  * Created by Gavriil Sitnikov on 12/05/16.
  */
 public abstract class Chat<TOutgoingMessage> {
+
+    private static final int RETRY_SENDING_DELAY = 500;
 
     @NonNull
     private final PublishSubject<TOutgoingMessage> messageToSendEvent = PublishSubject.create();
@@ -69,9 +73,10 @@ public abstract class Chat<TOutgoingMessage> {
                                     }
                                     return getSendMessageObservable(message);
                                 })
-                                .retryWhen(attempts -> attempts.map(throwable -> {
+                                .retryWhen(attempts -> attempts.switchMap(throwable -> {
                                     isSendingInError.onNext(true);
-                                    return retrySendingEvent;
+                                    return Observable.timer(RETRY_SENDING_DELAY, TimeUnit.MILLISECONDS)
+                                            .switchMap(aLong -> retrySendingEvent);
                                 }))))
                 .subscribe();
 
