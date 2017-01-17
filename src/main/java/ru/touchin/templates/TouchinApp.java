@@ -26,15 +26,19 @@ import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.multidex.MultiDex;
+import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.fabric.sdk.android.Fabric;
 import ru.touchin.roboswag.components.navigation.fragments.ViewControllerFragment;
+import ru.touchin.roboswag.components.utils.UiUtils;
 import ru.touchin.roboswag.components.views.TypefacedEditText;
 import ru.touchin.roboswag.components.views.TypefacedTextView;
 import ru.touchin.roboswag.core.log.ConsoleLogProcessor;
@@ -89,6 +93,7 @@ public abstract class TouchinApp extends Application {
             TypefacedEditText.setInDebugMode();
             TypefacedTextView.setInDebugMode();
             Lc.initialize(new ConsoleLogProcessor(LcLevel.VERBOSE), true);
+            UiUtils.UI_LIFECYCLE_LC_GROUP.disable();
         } else {
             final Crashlytics crashlytics = new Crashlytics();
             Fabric.with(this, crashlytics);
@@ -99,6 +104,8 @@ public abstract class TouchinApp extends Application {
     private void enableStrictMode() {
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
                 .detectAll()
+                .permitDiskReads()
+                .permitDiskWrites()
                 .penaltyLog()
                 .build());
         StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
@@ -113,7 +120,7 @@ public abstract class TouchinApp extends Application {
         private final Crashlytics crashlytics;
 
         public CrashlyticsLogProcessor(@NonNull final Crashlytics crashlytics) {
-            super(LcLevel.ASSERT);
+            super(LcLevel.INFO);
             this.crashlytics = crashlytics;
         }
 
@@ -123,14 +130,36 @@ public abstract class TouchinApp extends Application {
                                       @NonNull final String tag,
                                       @NonNull final String message,
                                       @Nullable final Throwable throwable) {
-            if (!level.lessThan(LcLevel.ASSERT)) {
+            if (group == UiUtils.UI_LIFECYCLE_LC_GROUP) {
+                crashlytics.core.log(level.getPriority(), tag, message);
+            } else if (!level.lessThan(LcLevel.ASSERT)
+                    || (group == ApiModel.API_VALIDATION_LC_GROUP && level == LcLevel.ERROR)) {
+                Log.e(tag, message);
                 if (throwable != null) {
-                    crashlytics.core.log(tag + ':' + message);
+                    crashlytics.core.log(level.getPriority(), tag, message);
                     crashlytics.core.logException(throwable);
                 } else {
-                    crashlytics.core.logException(new ShouldNotHappenException(tag + ':' + message));
+                    final ShouldNotHappenException exceptionToLog = new ShouldNotHappenException(tag + ':' + message);
+                    reduceStackTrace(exceptionToLog);
+                    crashlytics.core.logException(exceptionToLog);
                 }
             }
+        }
+
+        private void reduceStackTrace(@NonNull final Throwable throwable) {
+            final StackTraceElement[] stackTrace = throwable.getStackTrace();
+            final List<StackTraceElement> reducedStackTraceList = new ArrayList<>();
+            for (int i = stackTrace.length - 1; i >= 0; i--) {
+                final StackTraceElement stackTraceElement = stackTrace[i];
+                if (stackTraceElement.getClassName().contains(getClass().getSimpleName())
+                        || stackTraceElement.getClassName().contains(LcGroup.class.getName())
+                        || stackTraceElement.getClassName().contains(Lc.class.getName())) {
+                    break;
+                }
+                reducedStackTraceList.add(stackTraceElement);
+            }
+            final StackTraceElement[] reducedStackTrace = new StackTraceElement[reducedStackTraceList.size()];
+            throwable.setStackTrace(reducedStackTraceList.toArray(reducedStackTrace));
         }
 
     }
