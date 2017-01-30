@@ -17,13 +17,16 @@
  *
  */
 
-package ru.touchin.templates.validation;
+package ru.touchin.templates.validation.validationcontrollers;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.io.Serializable;
 
+import ru.touchin.templates.validation.ValidationState;
+import ru.touchin.templates.validation.ViewWithError;
+import ru.touchin.templates.validation.validators.Validator;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -64,7 +67,7 @@ public abstract class TwoWayValidationController
     }
 
     protected boolean showError(@NonNull final ValidationState validationState) {
-        return validationState != ValidationState.VALID && validationState != ValidationState.INITIAL;
+        return !validationState.equals(ValidationState.VALID) && !validationState.equals(ValidationState.INITIAL);
     }
 
 }

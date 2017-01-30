@@ -17,15 +17,17 @@
  *
  */
 
-package ru.touchin.templates.validation;
+package ru.touchin.templates.validation.validationcontrollers;
 
 import android.support.annotation.NonNull;
+
+import ru.touchin.templates.validation.validators.Validator;
 
 /**
  * Created by Ilia Kurtov on 24/01/2017.
  * TODO: fill
  */
-public abstract class ValidationController<TValidator extends Validator> {
+public class ValidationController<TValidator extends Validator> {
 
     @NonNull
     private final TValidator validator;

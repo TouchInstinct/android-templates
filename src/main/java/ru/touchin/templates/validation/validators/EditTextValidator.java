@@ -17,7 +17,7 @@
  *
  */
 
-package ru.touchin.templates.validation;
+package ru.touchin.templates.validation.validators;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -28,9 +28,11 @@ import ru.touchin.roboswag.core.log.Lc;
 import ru.touchin.roboswag.core.observables.Changeable;
 import ru.touchin.roboswag.core.observables.NonNullChangeable;
 import ru.touchin.roboswag.core.utils.pairs.HalfNullablePair;
+import ru.touchin.templates.validation.ConversionException;
+import ru.touchin.templates.validation.ValidationFunc;
+import ru.touchin.templates.validation.ValidationState;
 import rx.Observable;
 import rx.exceptions.OnErrorThrowable;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -42,29 +44,29 @@ public abstract class EditTextValidator<TModel extends Serializable> extends Val
     @NonNull
     private final NonNullChangeable<Boolean> showFullCheck = new NonNullChangeable<>(false);
     @NonNull
-    private final Changeable<Func1<TModel, HalfNullablePair<ValidationState, TModel>>> finalCheck = new Changeable<>(null);
+    private final Changeable<ValidationFunc<TModel, HalfNullablePair<ValidationState, TModel>>> finalCheck = new Changeable<>(null);
     @NonNull
-    private final Changeable<Func1<String, HalfNullablePair<ValidationState, TModel>>> primaryCheck = new Changeable<>(null);
+    private final Changeable<ValidationFunc<String, HalfNullablePair<ValidationState, TModel>>> primaryCheck = new Changeable<>(null);
 
     @NonNull
     public NonNullChangeable<Boolean> getShowFullCheck() {
         return showFullCheck;
     }
 
-    @Nullable
-    public Changeable<Func1<TModel, HalfNullablePair<ValidationState, TModel>>> getFinalCheck() {
+    @NonNull
+    public Changeable<ValidationFunc<TModel, HalfNullablePair<ValidationState, TModel>>> getFinalCheck() {
         return finalCheck;
     }
 
-    @Nullable
-    public Changeable<Func1<String, HalfNullablePair<ValidationState, TModel>>> getPrimaryCheck() {
+    @NonNull
+    public Changeable<ValidationFunc<String, HalfNullablePair<ValidationState, TModel>>> getPrimaryCheck() {
         return primaryCheck;
     }
 
     @NonNull
     private HalfNullablePair<ValidationState, TModel> validateText(
-            @Nullable final Func1<TModel, HalfNullablePair<ValidationState, TModel>> finalCheck,
-            @Nullable final Func1<String, HalfNullablePair<ValidationState, TModel>> primaryCheck,
+            @Nullable final ValidationFunc<TModel, HalfNullablePair<ValidationState, TModel>> finalCheck,
+            @Nullable final ValidationFunc<String, HalfNullablePair<ValidationState, TModel>> primaryCheck,
             @NonNull final String text, final boolean fullCheck)
             throws ConversionException {
         if (primaryCheck == null && finalCheck == null) {
@@ -120,7 +122,8 @@ public abstract class EditTextValidator<TModel extends Serializable> extends Val
 
     @NonNull
     public Observable<HalfNullablePair<ValidationState, TModel>> fullValidateAndGetModel(@NonNull final String text) {
-        return createValidationObservable(text, true);
+        return createValidationObservable(text, true)
+                .first();
     }
 
 }

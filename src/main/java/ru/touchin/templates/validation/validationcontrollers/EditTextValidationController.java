@@ -17,14 +17,17 @@
  *
  */
 
-package ru.touchin.templates.validation;
+package ru.touchin.templates.validation.validationcontrollers;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import java.io.Serializable;
 
 import ru.touchin.roboswag.core.utils.pairs.NonNullPair;
+import ru.touchin.templates.validation.ValidationState;
+import ru.touchin.templates.validation.validators.EditTextValidator;
 import rx.Observable;
 
 /**
@@ -40,26 +43,11 @@ public class EditTextValidationController<TModel extends Serializable>
 
     @NonNull
     public Observable<?> validation(@NonNull final Observable<Boolean> focusOutObservable, @NonNull final Observable<Boolean> activatedObservable) {
-        return Observable
-                .<Boolean, String, Boolean, Boolean, NonNullPair<Boolean, Observable<ValidationState>>>combineLatest(activatedObservable,
-                        getValidator().getWrapperModel().observe(),
-                        focusOutObservable,
-                        getValidator().getShowFullCheck().observe(),
-                        (activated, text, focusIn, showError) -> {
-                            if (focusIn == null && TextUtils.isEmpty(text) && !activated && !showError) {
-                                return null;
-                            }
-                            final boolean focus = focusIn == null ? false : focusIn;
-                            if (TextUtils.isEmpty(text)) {
-                                return new NonNullPair<>(focus, (activated || showError)
-                                        ? getValidator().getValidationStateWhenEmpty().observe()
-                                        : Observable.just(ValidationState.INITIAL));
-                            }
-                            if (!showError && focus) {
-                                return new NonNullPair<>(true, getValidator().primaryValidate(text));
-                            }
-                            return new NonNullPair<>(focus, getValidator().fullValidate(text));
-                        })
+        return Observable.combineLatest(activatedObservable,
+                getValidator().getWrapperModel().observe(),
+                focusOutObservable,
+                getValidator().getShowFullCheck().observe(),
+                this::getValidationPair)
                 .switchMap(validationPair -> {
                     if (validationPair == null) {
                         return Observable.empty();
@@ -72,6 +60,27 @@ public class EditTextValidationController<TModel extends Serializable>
                                 getValidator().getValidationState().set(validationState);
                             });
                 });
+    }
+
+    @Nullable
+    @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
+    private NonNullPair<Boolean, Observable<ValidationState>> getValidationPair(final boolean activated,
+                                                                                @Nullable final String text,
+                                                                                @Nullable final Boolean focusIn,
+                                                                                final boolean showError) {
+        if (focusIn == null && TextUtils.isEmpty(text) && !activated && !showError) {
+            return null;
+        }
+        final boolean focus = focusIn == null ? false : focusIn;
+        if (TextUtils.isEmpty(text)) {
+            return new NonNullPair<>(focus, (activated || showError)
+                    ? getValidator().getValidationStateWhenEmpty().observe()
+                    : Observable.just(ValidationState.INITIAL));
+        }
+        if (!showError && focus) {
+            return new NonNullPair<>(true, getValidator().primaryValidate(text));
+        }
+        return new NonNullPair<>(focus, getValidator().fullValidate(text));
     }
 
 }
