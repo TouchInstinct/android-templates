@@ -24,15 +24,12 @@ import android.support.annotation.Nullable;
 
 import java.io.Serializable;
 
-import ru.touchin.roboswag.core.log.Lc;
 import ru.touchin.roboswag.core.observables.Changeable;
 import ru.touchin.roboswag.core.observables.NonNullChangeable;
 import ru.touchin.roboswag.core.utils.pairs.HalfNullablePair;
-import ru.touchin.templates.validation.ConversionException;
 import ru.touchin.templates.validation.ValidationFunc;
 import ru.touchin.templates.validation.ValidationState;
 import rx.Observable;
-import rx.exceptions.OnErrorThrowable;
 import rx.schedulers.Schedulers;
 
 /**
@@ -68,11 +65,10 @@ public abstract class EditTextValidator<TModel extends Serializable> extends Val
             @Nullable final ValidationFunc<TModel, HalfNullablePair<ValidationState, TModel>> finalCheck,
             @Nullable final ValidationFunc<String, HalfNullablePair<ValidationState, TModel>> primaryCheck,
             @NonNull final String text, final boolean fullCheck)
-            throws ConversionException {
+            throws Throwable {
         if (primaryCheck == null && finalCheck == null) {
             return new HalfNullablePair<>(ValidationState.VALID, convertWrapperModelToModel(text));
         }
-
         if (primaryCheck != null) {
             final HalfNullablePair<ValidationState, TModel> primaryPair = primaryCheck.call(text);
             if (finalCheck == null || primaryPair.getFirst() != ValidationState.VALID || primaryPair.getSecond() == null || !fullCheck) {
@@ -84,6 +80,8 @@ public abstract class EditTextValidator<TModel extends Serializable> extends Val
     }
 
     @NonNull
+    @SuppressWarnings("PMD.AvoidCatchingThrowable")
+    // It's intended
     private Observable<HalfNullablePair<ValidationState, TModel>> createValidationObservable(@NonNull final String text, final boolean fullCheck) {
         return Observable
                 .combineLatest(finalCheck.observe().observeOn(Schedulers.computation()),
@@ -91,8 +89,8 @@ public abstract class EditTextValidator<TModel extends Serializable> extends Val
                         (finalCheck, primaryCheck) -> {
                             try {
                                 return validateText(finalCheck, primaryCheck, text, fullCheck);
-                            } catch (final ConversionException exception) {
-                                throw OnErrorThrowable.from(exception);
+                            } catch (final Throwable exception) {
+                                return new HalfNullablePair<>(ValidationState.ERROR_CONVERSION, null);
                             }
                         });
     }
@@ -100,14 +98,7 @@ public abstract class EditTextValidator<TModel extends Serializable> extends Val
     @NonNull
     private Observable<ValidationState> processChecks(@NonNull final String text, final boolean fullCheck) {
         return createValidationObservable(text, fullCheck)
-                .map(HalfNullablePair::getFirst)
-                .onErrorResumeNext(throwable -> {
-                    if (throwable instanceof ConversionException || throwable.getCause() instanceof ConversionException) {
-                        Lc.assertion(throwable);
-                        return Observable.just(ValidationState.ERROR_CONVERSION);
-                    }
-                    return Observable.error(throwable);
-                });
+                .map(HalfNullablePair::getFirst);
     }
 
     @NonNull
