@@ -36,6 +36,7 @@ import ru.touchin.roboswag.core.observables.storable.Converter;
 import ru.touchin.roboswag.core.observables.storable.Storable;
 import ru.touchin.roboswag.core.observables.storable.concrete.NonNullStorable;
 import ru.touchin.roboswag.core.utils.ShouldNotHappenException;
+import rx.Scheduler;
 
 /**
  * Created by Gavriil Sitnikov on 23/08/2016.
@@ -53,6 +54,17 @@ public final class GoogleJsonPreferences {
     }
 
     @NonNull
+    public static <T> Storable<String, T, String> jsonStorable(@NonNull final String name,
+                                                               @NonNull final Class<T> jsonClass,
+                                                               @NonNull final SharedPreferences preferences,
+                                                               @NonNull final Scheduler scheduler) {
+        return new Storable.Builder<String, T, String>(name, jsonClass, String.class, new PreferenceStore<>(preferences), new JsonConverter<>())
+                .setObserveStrategy(Storable.ObserveStrategy.CACHE_ACTUAL_VALUE)
+                .setStoreScheduler(scheduler)
+                .build();
+    }
+
+    @NonNull
     public static <T> NonNullStorable<String, T, String> jsonStorable(@NonNull final String name,
                                                                       @NonNull final Class<T> jsonClass,
                                                                       @NonNull final SharedPreferences preferences,
@@ -60,6 +72,19 @@ public final class GoogleJsonPreferences {
         return new Storable.Builder<String, T, String>(name, jsonClass, String.class, new PreferenceStore<>(preferences), new JsonConverter<>())
                 .setObserveStrategy(Storable.ObserveStrategy.CACHE_ACTUAL_VALUE)
                 .setDefaultValue(defaultValue)
+                .build();
+    }
+
+    @NonNull
+    public static <T> NonNullStorable<String, T, String> jsonStorable(@NonNull final String name,
+                                                                      @NonNull final Class<T> jsonClass,
+                                                                      @NonNull final SharedPreferences preferences,
+                                                                      @NonNull final T defaultValue,
+                                                                      @NonNull final Scheduler scheduler) {
+        return new Storable.Builder<String, T, String>(name, jsonClass, String.class, new PreferenceStore<>(preferences), new JsonConverter<>())
+                .setObserveStrategy(Storable.ObserveStrategy.CACHE_ACTUAL_VALUE)
+                .setDefaultValue(defaultValue)
+                .setStoreScheduler(scheduler)
                 .build();
     }
 
@@ -73,6 +98,17 @@ public final class GoogleJsonPreferences {
     }
 
     @NonNull
+    public static <T> Storable<String, List<T>, String> jsonListStorable(@NonNull final String name,
+                                                                         @NonNull final Class<T> jsonListItemClass,
+                                                                         @NonNull final SharedPreferences preferences,
+                                                                         @NonNull final Scheduler scheduler) {
+        return new Storable.Builder<>(name, List.class, String.class, new PreferenceStore<>(preferences), new JsonListConverter<>(jsonListItemClass))
+                .setObserveStrategy(Storable.ObserveStrategy.CACHE_ACTUAL_VALUE)
+                .setStoreScheduler(scheduler)
+                .build();
+    }
+
+    @NonNull
     public static <T> NonNullStorable<String, List<T>, String> jsonListStorable(@NonNull final String name,
                                                                                 @NonNull final Class<T> jsonListItemClass,
                                                                                 @NonNull final SharedPreferences preferences,
@@ -80,6 +116,19 @@ public final class GoogleJsonPreferences {
         return new Storable.Builder<>(name, List.class, String.class, new PreferenceStore<>(preferences), new JsonListConverter<>(jsonListItemClass))
                 .setObserveStrategy(Storable.ObserveStrategy.CACHE_ACTUAL_VALUE)
                 .setDefaultValue(defaultValue)
+                .build();
+    }
+
+    @NonNull
+    public static <T> NonNullStorable<String, List<T>, String> jsonListStorable(@NonNull final String name,
+                                                                                @NonNull final Class<T> jsonListItemClass,
+                                                                                @NonNull final SharedPreferences preferences,
+                                                                                @NonNull final List<T> defaultValue,
+                                                                                @NonNull final Scheduler scheduler) {
+        return new Storable.Builder<>(name, List.class, String.class, new PreferenceStore<>(preferences), new JsonListConverter<>(jsonListItemClass))
+                .setObserveStrategy(Storable.ObserveStrategy.CACHE_ACTUAL_VALUE)
+                .setDefaultValue(defaultValue)
+                .setStoreScheduler(scheduler)
                 .build();
     }
 
