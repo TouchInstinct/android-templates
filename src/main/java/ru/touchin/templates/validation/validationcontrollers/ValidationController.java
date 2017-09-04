@@ -53,10 +53,11 @@ public class ValidationController
     /**
      * Bind to this observable to connect view and model. If you provide first argument (viewStateObservable) - the connection would be two-way.
      * If not - one-way. This method changes updates view with current {@link ValidationState}.
+     *
      * @param viewStateObservable input view state {@link Observable}.
      *                            Eg it can be observable with input text from the {@link android.widget.EditText}
-     * @param updateViewAction action that updates current state of the bounded view.
-     * @param viewWithError view that implements {@link ViewWithError} interface and could reacts to the validation errors.
+     * @param updateViewAction    action that updates current state of the bounded view.
+     * @param viewWithError       view that implements {@link ViewWithError} interface and could reacts to the validation errors.
      * @return observable without any concrete type. Simply subscribe to this method to make it works.
      */
     @NonNull
@@ -68,7 +69,7 @@ public class ValidationController
                 : Observable.empty();
         return Observable
                 .merge(getValidator().getWrapperModel().observe()
-                        .observeOn(AndroidSchedulers.mainThread())
+                                .observeOn(AndroidSchedulers.mainThread())
                                 .doOnNext(updateViewAction),
                         getValidator().getValidationState().observe()
                                 .observeOn(AndroidSchedulers.mainThread())
@@ -84,6 +85,7 @@ public class ValidationController
 
     /**
      * Helper function to check if validation state in error state ot not
+     *
      * @param validationState the state you want to check for the errors.
      * @return true if validation state is in error and false otherwise.
      */

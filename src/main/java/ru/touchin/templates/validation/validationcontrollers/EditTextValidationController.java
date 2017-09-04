@@ -98,8 +98,7 @@ public class EditTextValidationController<TModel extends Serializable>
     /**
      * If we don't want to show error when focus is lost.
      *
-     * @param showErrorOnFocusOut  show an error or don't show an error. 
-     *
+     * @param showErrorOnFocusOut show an error or don't show an error.
      */
     public void setShowErrorOnFocusOut(final boolean showErrorOnFocusOut) {
         this.showErrorOnFocusOut = showErrorOnFocusOut;

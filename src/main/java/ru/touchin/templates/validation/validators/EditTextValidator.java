@@ -51,6 +51,7 @@ public abstract class EditTextValidator<TModel extends Serializable> extends Val
      * This flag needed to force showing errors. You don't want to show final error when you start to enter data in some field at first time.
      * But if user leaves this view and final check not passed - you need to force to show an error till user not enters correct data and leaves
      * the view.
+     *
      * @return {@link NonNullChangeable} with current state of the flag - do we need to show errors from final checks while user types.
      */
     @NonNull
@@ -60,6 +61,7 @@ public abstract class EditTextValidator<TModel extends Serializable> extends Val
 
     /**
      * Use this method to get or set final check.
+     *
      * @return final check.
      */
     @NonNull
@@ -69,6 +71,7 @@ public abstract class EditTextValidator<TModel extends Serializable> extends Val
 
     /**
      * Use this method to get or set primary check.
+     *
      * @return primary check.
      */
     @NonNull
@@ -119,6 +122,7 @@ public abstract class EditTextValidator<TModel extends Serializable> extends Val
 
     /**
      * Validates text with primary check.
+     *
      * @param text - input text.
      * @return {@link Observable} with the result of the primary check.
      */
@@ -129,6 +133,7 @@ public abstract class EditTextValidator<TModel extends Serializable> extends Val
 
     /**
      * Validates text with final check.
+     *
      * @param text - input text.
      * @return {@link Observable} with the result of the final check.
      */
@@ -140,9 +145,10 @@ public abstract class EditTextValidator<TModel extends Serializable> extends Val
     /**
      * Validates text with primary and final check consequentially and returns {@link Observable} with {@link HalfNullablePair} of final state
      * and resulting model.
+     *
      * @param text - input text.
      * @return pair with final {@link ValidationState} that is always not null and a model that we get after converting the text.
-     *         Model can be null if validation fails on primary or final checks.
+     * Model can be null if validation fails on primary or final checks.
      */
     @NonNull
     @Override
