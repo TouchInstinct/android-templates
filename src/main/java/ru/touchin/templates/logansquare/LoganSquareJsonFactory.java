@@ -20,12 +20,15 @@
 package ru.touchin.templates.logansquare;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.bluelinelabs.logansquare.ConverterUtils;
 import com.bluelinelabs.logansquare.LoganSquare;
+import com.fasterxml.jackson.core.JsonGenerator;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -60,6 +63,16 @@ public class LoganSquareJsonFactory extends Converter.Factory {
                                                           @NonNull final Annotation[] methodAnnotations,
                                                           @NonNull final Retrofit retrofit) {
         return new LoganSquareRequestBodyConverter<>();
+    }
+
+    @Nullable
+    @Override
+    public Converter<?, String> stringConverter(@NonNull final Type type, @NonNull final Annotation[] annotations, @NonNull final Retrofit retrofit) {
+        if (type instanceof Class && ((Class) type).getSuperclass() == Enum.class) {
+            return new LoganSquareStringEnumConverter<>();
+        } else {
+            return super.stringConverter(type, annotations, retrofit);
+        }
     }
 
     public static class LoganSquareJsonResponseBodyConverter<T> extends JsonResponseBodyConverter<T> {
@@ -100,9 +113,27 @@ public class LoganSquareJsonFactory extends Converter.Factory {
     public static class LoganSquareRequestBodyConverter<T> extends JsonRequestBodyConverter<T> {
 
         @Override
-        protected void writeValueToByteArray(@NonNull final T value, @NonNull final ByteArrayOutputStream byteArrayOutputStream)
-                throws IOException {
+        protected void writeValueToByteArray(@NonNull final T value, @NonNull final ByteArrayOutputStream byteArrayOutputStream) throws IOException {
             LoganSquare.serialize(value, byteArrayOutputStream);
+        }
+
+    }
+
+    public static class LoganSquareStringEnumConverter<T> implements Converter<T, String> {
+
+        @Nullable
+        @SuppressWarnings({"unchecked", "TryFinallyCanBeTryWithResources"})
+        @Override
+        public String convert(@NonNull final T value) throws IOException {
+            final StringWriter writer = new StringWriter();
+            try {
+                final JsonGenerator generator = LoganSquare.JSON_FACTORY.createGenerator(writer);
+                LoganSquare.typeConverterFor((Class<T>) value.getClass()).serialize(value, null, false, generator);
+                generator.close();
+                return writer.toString().replaceAll("\"", "");
+            } finally {
+                writer.close();
+            }
         }
 
     }
