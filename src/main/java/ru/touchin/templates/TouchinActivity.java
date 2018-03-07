@@ -31,16 +31,13 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 
 import ru.touchin.roboswag.components.navigation.activities.ViewControllerActivity;
-import ru.touchin.roboswag.components.utils.Logic;
 import ru.touchin.roboswag.core.log.Lc;
 
 /**
  * Created by Gavriil Sitnikov on 11/03/16.
  * Base class of activity to extends for Touch Instinct related projects.
- *
- * @param <TLogic> Type of application's {@link Logic}.
  */
-public abstract class TouchinActivity<TLogic extends Logic> extends ViewControllerActivity<TLogic> {
+public abstract class TouchinActivity extends ViewControllerActivity {
 
     @Override
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
