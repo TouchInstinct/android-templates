@@ -16,6 +16,7 @@ android {
 
 dependencies {
     api project(path: ':libraries:components')
+    api 'javax.inject:javax.inject:1'
 
     api 'net.danlew:android.joda:2.9.9'
     api 'com.android.support:multidex:1.0.3'
