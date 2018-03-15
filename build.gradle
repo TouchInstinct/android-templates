@@ -31,7 +31,7 @@ dependencies {
     provided "com.android.support:recyclerview-v7:$supportLibraryVersion"
     provided "com.android.support:appcompat-v7:$supportLibraryVersion"
 
-    provided 'com.squareup.retrofit2:retrofit:2.3.0'
+    provided "com.squareup.retrofit2:retrofit:$retrofitVersion"
 
     //bug 1.7.0 https://github.com/facebook/fresco/issues/1991
     //noinspection NewerVersionAvailable
