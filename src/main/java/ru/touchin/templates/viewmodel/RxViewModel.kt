@@ -11,7 +11,7 @@ import ru.touchin.templates.livedata.LiveDataDispatcher
  * Created by Denis Karmyshakov on 14.03.18.
  * Base class of ViewModel with [io.reactivex.disposables.Disposable] handling.
  */
-open class DestroyableViewModel(
+open class RxViewModel(
         private val destroyable: BaseDestroyable = BaseDestroyable(),
         private val liveDataDispatcher: BaseLiveDataDispatcher = BaseLiveDataDispatcher(destroyable)
 ) : ViewModel(), Destroyable by destroyable, LiveDataDispatcher by liveDataDispatcher {
