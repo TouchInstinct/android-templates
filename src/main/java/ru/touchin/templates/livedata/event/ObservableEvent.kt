@@ -1,4 +1,4 @@
-package ru.touchin.templates.viewmodel
+package ru.touchin.templates.livedata.event
 
 /**
  * Created by Denis Karmyshakov on 14.03.18.

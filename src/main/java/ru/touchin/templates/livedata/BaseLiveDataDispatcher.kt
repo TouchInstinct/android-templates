@@ -2,16 +2,25 @@ package ru.touchin.templates.livedata
 
 import android.arch.lifecycle.MutableLiveData
 import io.reactivex.Completable
+import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Single
 import ru.touchin.roboswag.components.utils.destroyable.Destroyable
-import ru.touchin.templates.viewmodel.CompletableEvent
-import ru.touchin.templates.viewmodel.MaybeEvent
-import ru.touchin.templates.viewmodel.ObservableEvent
-import ru.touchin.templates.viewmodel.SingleEvent
+import ru.touchin.templates.livedata.event.CompletableEvent
+import ru.touchin.templates.livedata.event.MaybeEvent
+import ru.touchin.templates.livedata.event.ObservableEvent
+import ru.touchin.templates.livedata.event.SingleEvent
 
 class BaseLiveDataDispatcher(private val destroyable: Destroyable) : LiveDataDispatcher {
+
+    override fun <T> Flowable<T>.dispatchTo(liveData: MutableLiveData<ObservableEvent<T>>) {
+        liveData.value = ObservableEvent.Loading(liveData.value?.data)
+        destroyable.untilDestroy(this,
+                { data -> liveData.value = ObservableEvent.Success(data) },
+                { throwable -> liveData.value = ObservableEvent.Error(throwable, liveData.value?.data) },
+                { liveData.value = ObservableEvent.Completed(liveData.value?.data) })
+    }
 
     override fun <T> Observable<T>.dispatchTo(liveData: MutableLiveData<ObservableEvent<T>>) {
         liveData.value = ObservableEvent.Loading(liveData.value?.data)
@@ -29,9 +38,9 @@ class BaseLiveDataDispatcher(private val destroyable: Destroyable) : LiveDataDis
     }
 
     override fun Completable.dispatchTo(liveData: MutableLiveData<CompletableEvent>) {
-        liveData.value = CompletableEvent.Loading()
+        liveData.value = CompletableEvent.Loading
         destroyable.untilDestroy(this,
-                { liveData.value = CompletableEvent.Completed() },
+                { liveData.value = CompletableEvent.Completed },
                 { throwable -> liveData.value = CompletableEvent.Error(throwable) })
     }
 
