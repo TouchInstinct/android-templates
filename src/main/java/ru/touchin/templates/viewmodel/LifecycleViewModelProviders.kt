@@ -22,7 +22,7 @@ object LifecycleViewModelProviders {
      */
     fun of(lifecycleOwner: LifecycleOwner, factory: ViewModelProvider.Factory = getViewModelFactory(lifecycleOwner)): ViewModelProvider =
             when (lifecycleOwner) {
-                is ViewController<*, *, *> -> ViewModelProviders.of(lifecycleOwner.getFragment(), factory)
+                is ViewController<*, *> -> ViewModelProviders.of(lifecycleOwner.fragment, factory)
                 is Fragment -> ViewModelProviders.of(lifecycleOwner, factory)
                 is FragmentActivity -> ViewModelProviders.of(lifecycleOwner, factory)
                 else -> throw IllegalArgumentException("Not supported LifecycleOwner.")
@@ -40,7 +40,7 @@ object LifecycleViewModelProviders {
     fun getViewModelFactory(provider: Any): ViewModelProvider.Factory =
             when (provider) {
                 is ViewModelFactoryProvider -> provider.viewModelFactory
-                is ViewController<*, *, *> -> getViewModelFactory(provider.getFragment())
+                is ViewController<*, *> -> getViewModelFactory(provider.fragment)
                 is Fragment -> getViewModelFactory(provider.parentFragment ?: provider.requireActivity())
                 is Activity -> getViewModelFactory(provider.application)
                 else -> throw IllegalArgumentException("View model factory not found.")
