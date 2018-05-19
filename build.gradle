@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion compileSdk
@@ -13,40 +14,29 @@ android {
     }
 }
 
-repositories {
-    maven { url 'https://maven.fabric.io/public' }
-    maven { url "http://dl.bintray.com/touchin/touchin-tools" }
-}
-
 dependencies {
     api project(path: ':libraries:components')
+    api 'javax.inject:javax.inject:1'
 
     api 'net.danlew:android.joda:2.9.9'
-    api 'com.android.support:multidex:1.0.2'
+    api 'com.android.support:multidex:1.0.3'
 
     api "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion"
     api "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
 
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
     compileOnly "com.android.support:recyclerview-v7:$supportLibraryVersion"
     compileOnly "com.android.support:appcompat-v7:$supportLibraryVersion"
 
-    compileOnly 'com.squareup.retrofit2:retrofit:2.3.0'
+    compileOnly "android.arch.lifecycle:extensions:$lifecycleVersion"
 
-    compileOnly 'com.facebook.fresco:fresco:1.5.0'
-    compileOnly 'ru.touchin:logansquare:1.4.2'
+    compileOnly "com.squareup.retrofit2:retrofit:$retrofitVersion"
 
-    compileOnly 'com.scottyab:aes-crypto:0.0.4'
+    compileOnly 'ru.touchin:logansquare:1.4.3'
 
-    // don't use latest(1.0 and above)  because they don't support Socket.IO server 1.x version
-    //noinspection NewerVersionAvailable
-    compileOnly('io.socket:socket.io-client:0.9.0') {
-        exclude group: 'org.json', module: 'json'
-    }
-
-    compileOnly('com.crashlytics.sdk.android:crashlytics:2.8.0@aar') {
+    compileOnly("com.crashlytics.sdk.android:crashlytics:$crashlyticsVersion@aar") {
         transitive = true
     }
-
-    compileOnly 'com.facebook.stetho:stetho:1.5.0'
 
 }

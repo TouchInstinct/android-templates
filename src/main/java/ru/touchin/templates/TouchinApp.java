@@ -29,7 +29,6 @@ import android.support.multidex.MultiDex;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
-import com.facebook.stetho.Stetho;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
@@ -43,7 +42,6 @@ import io.reactivex.android.plugins.RxAndroidPlugins;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.disposables.Disposables;
-import ru.touchin.roboswag.components.adapters.ObservableCollectionAdapter;
 import ru.touchin.roboswag.components.navigation.fragments.ViewControllerFragment;
 import ru.touchin.roboswag.components.utils.UiUtils;
 import ru.touchin.roboswag.components.views.TypefacedEditText;
@@ -84,22 +82,11 @@ public abstract class TouchinApp extends Application {
         JodaTimeAndroid.init(this);
         if (isDebug()) {
             enableStrictMode();
-            try {
-                ObservableCollectionAdapter.setInDebugMode();
-            } catch (final NoClassDefFoundError error) {
-                Lc.w("RecyclerView initialization error! Did you forget to add debugCompile "
-                        + "'com.android.support:recyclerview-v7:+' to your build.gradle?");
-            }
             ViewControllerFragment.setInDebugMode();
             TypefacedEditText.setInDebugMode();
             TypefacedTextView.setInDebugMode();
             Lc.initialize(new ConsoleLogProcessor(LcLevel.VERBOSE), true);
             UiUtils.UI_LIFECYCLE_LC_GROUP.disable();
-            try {
-                Stetho.initializeWithDefaults(this);
-            } catch (final NoClassDefFoundError error) {
-                Lc.e("Stetho initialization error! Did you forget to add debugCompile 'com.facebook.stetho:stetho:+' to your build.gradle?");
-            }
         } else {
             try {
                 final Crashlytics crashlytics = new Crashlytics();
