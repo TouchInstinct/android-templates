@@ -19,6 +19,7 @@
 
 package ru.touchin.templates;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -91,6 +92,7 @@ public final class DeviceUtils {
             if (!TextUtils.equals(androidId, BUGGED_DEVICE_ID)) {
                 uuid = UUID.nameUUIDFromBytes(androidId.getBytes("utf8"));
             } else {
+                @SuppressLint("MissingPermission")
                 final String deviceId = ((TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
                 uuid = deviceId != null ? UUID.nameUUIDFromBytes(deviceId.getBytes("utf8")) : UUID.randomUUID();
             }
@@ -113,6 +115,7 @@ public final class DeviceUtils {
     @NonNull
     public static NetworkType getNetworkType(@NonNull final Context context) {
         final ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        @SuppressLint("MissingPermission")
         final NetworkInfo info = cm.getActiveNetworkInfo();
         if (info == null || !info.isConnected()) {
             return NetworkType.NONE;
