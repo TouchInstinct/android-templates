@@ -14,14 +14,14 @@ import ru.touchin.templates.livedata.event.SingleEvent
 
 interface LiveDataDispatcher {
 
-    fun <T> Flowable<T>.dispatchTo(liveData: MutableLiveData<ObservableEvent<T>>): Disposable
+    fun <T> Flowable<out T>.dispatchTo(liveData: MutableLiveData<ObservableEvent<T>>): Disposable
 
-    fun <T> Observable<T>.dispatchTo(liveData: MutableLiveData<ObservableEvent<T>>): Disposable
+    fun <T> Observable<out T>.dispatchTo(liveData: MutableLiveData<ObservableEvent<T>>): Disposable
 
-    fun <T> Single<T>.dispatchTo(liveData: MutableLiveData<SingleEvent<T>>): Disposable
+    fun <T> Single<out T>.dispatchTo(liveData: MutableLiveData<SingleEvent<T>>): Disposable
 
     fun Completable.dispatchTo(liveData: MutableLiveData<CompletableEvent>): Disposable
 
-    fun <T> Maybe<T>.dispatchTo(liveData: MutableLiveData<MaybeEvent<T>>): Disposable
+    fun <T> Maybe<out T>.dispatchTo(liveData: MutableLiveData<MaybeEvent<T>>): Disposable
 
 }
