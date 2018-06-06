@@ -15,7 +15,7 @@ import ru.touchin.templates.livedata.event.SingleEvent
 
 class BaseLiveDataDispatcher(private val destroyable: Destroyable) : LiveDataDispatcher {
 
-    override fun <T> Flowable<T>.dispatchTo(liveData: MutableLiveData<ObservableEvent<T>>): Disposable {
+    override fun <T> Flowable<out T>.dispatchTo(liveData: MutableLiveData<ObservableEvent<T>>): Disposable {
         liveData.value = ObservableEvent.Loading(liveData.value?.data)
         return destroyable.untilDestroy(this,
                 { data -> liveData.value = ObservableEvent.Success(data) },
@@ -23,7 +23,7 @@ class BaseLiveDataDispatcher(private val destroyable: Destroyable) : LiveDataDis
                 { liveData.value = ObservableEvent.Completed(liveData.value?.data) })
     }
 
-    override fun <T> Observable<T>.dispatchTo(liveData: MutableLiveData<ObservableEvent<T>>): Disposable {
+    override fun <T> Observable<out T>.dispatchTo(liveData: MutableLiveData<ObservableEvent<T>>): Disposable {
         liveData.value = ObservableEvent.Loading(liveData.value?.data)
         return destroyable.untilDestroy(this,
                 { data -> liveData.value = ObservableEvent.Success(data) },
@@ -31,7 +31,7 @@ class BaseLiveDataDispatcher(private val destroyable: Destroyable) : LiveDataDis
                 { liveData.value = ObservableEvent.Completed(liveData.value?.data) })
     }
 
-    override fun <T> Single<T>.dispatchTo(liveData: MutableLiveData<SingleEvent<T>>): Disposable {
+    override fun <T> Single<out T>.dispatchTo(liveData: MutableLiveData<SingleEvent<T>>): Disposable {
         liveData.value = SingleEvent.Loading(liveData.value?.data)
         return destroyable.untilDestroy(this,
                 { data -> liveData.value = SingleEvent.Success(data) },
@@ -45,7 +45,7 @@ class BaseLiveDataDispatcher(private val destroyable: Destroyable) : LiveDataDis
                 { throwable -> liveData.value = CompletableEvent.Error(throwable) })
     }
 
-    override fun <T> Maybe<T>.dispatchTo(liveData: MutableLiveData<MaybeEvent<T>>): Disposable {
+    override fun <T> Maybe<out T>.dispatchTo(liveData: MutableLiveData<MaybeEvent<T>>): Disposable {
         liveData.value = MaybeEvent.Loading(liveData.value?.data)
         return destroyable.untilDestroy(this,
                 { data -> liveData.value = MaybeEvent.Success(data) },
