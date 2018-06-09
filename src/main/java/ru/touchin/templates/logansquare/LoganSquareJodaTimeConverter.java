@@ -22,12 +22,14 @@ package ru.touchin.templates.logansquare;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.bluelinelabs.logansquare.typeconverters.TypeConverter;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.io.IOException;
 
@@ -37,6 +39,17 @@ import ru.touchin.roboswag.core.log.Lc;
  * LoganSquare converter for joda.time.DateTime
  */
 public class LoganSquareJodaTimeConverter implements TypeConverter<DateTime> {
+
+    @Nullable
+    private final DateTimeFormatter formatter;
+
+    public LoganSquareJodaTimeConverter() {
+        this.formatter = null;
+    }
+
+    public LoganSquareJodaTimeConverter(@Nullable final DateTimeFormatter formatter) {
+        this.formatter = formatter;
+    }
 
     @Nullable
     @Override
@@ -54,15 +67,17 @@ public class LoganSquareJodaTimeConverter implements TypeConverter<DateTime> {
     }
 
     @Override
-    public void serialize(@Nullable final DateTime object,
-                          @Nullable final String fieldName,
-                          final boolean writeFieldNameForObject,
-                          @NonNull final JsonGenerator jsonGenerator)
-            throws IOException {
+    public void serialize(
+            @Nullable final DateTime object,
+            @Nullable final String fieldName,
+            final boolean writeFieldNameForObject,
+            @NonNull final JsonGenerator jsonGenerator
+    ) throws IOException {
+        final String serializedValue = object != null ? object.toString(formatter) : null;
         if (fieldName != null) {
-            jsonGenerator.writeStringField(fieldName, object != null && !object.toString().isEmpty() ? object.toString() : null);
+            jsonGenerator.writeStringField(fieldName, !TextUtils.isEmpty(serializedValue) ? serializedValue : null);
         } else {
-            jsonGenerator.writeString(object != null && !object.toString().isEmpty() ? object.toString() : null);
+            jsonGenerator.writeString(!TextUtils.isEmpty(serializedValue) ? serializedValue : null);
         }
     }
 
