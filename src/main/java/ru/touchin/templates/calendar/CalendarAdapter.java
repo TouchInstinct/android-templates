@@ -132,7 +132,7 @@ public abstract class CalendarAdapter<TDayViewHolder extends RecyclerView.ViewHo
             notifyItemRangeChanged(startSelectionPosition, 1);
             return;
         }
-        notifyItemRangeChanged(startSelectionPosition, endSelectionPosition - startSelectionPosition);
+        notifyItemRangeChanged(startSelectionPosition, endSelectionPosition - startSelectionPosition + 1);
     }
 
     @NonNull
