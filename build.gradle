@@ -22,7 +22,7 @@ dependencies {
     api project(path: ':libraries:components')
 
     api 'net.danlew:android.joda:2.9.9'
-    api 'com.android.support:multidex:1.0.2'
+    api 'com.android.support:multidex:1.0.3'
 
     api "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion"
     api "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
@@ -33,7 +33,7 @@ dependencies {
     compileOnly 'com.squareup.retrofit2:retrofit:2.3.0'
 
     compileOnly 'com.facebook.fresco:fresco:1.5.0'
-    compileOnly 'ru.touchin:logansquare:1.4.2'
+    compileOnly 'ru.touchin:logansquare:1.4.3'
 
     compileOnly 'com.scottyab:aes-crypto:0.0.4'
 
