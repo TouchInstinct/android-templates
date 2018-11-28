@@ -21,6 +21,7 @@ package ru.touchin.templates;
 
 import android.app.ActivityManager;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -62,9 +63,14 @@ public abstract class TouchinActivity<TLogic extends Logic> extends ViewControll
      * @param primaryColorRes Color of application to show in task bar.
      */
     protected void setupTaskDescriptor(@NonNull final String label, @DrawableRes final int iconRes, @ColorRes final int primaryColorRes) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             final ActivityManager.TaskDescription taskDescription = new ActivityManager.TaskDescription(label,
-                    ((BitmapDrawable) ContextCompat.getDrawable(this, iconRes)).getBitmap(),
+                    iconRes,
+                    ContextCompat.getColor(this, primaryColorRes));
+            setTaskDescription(taskDescription);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            final ActivityManager.TaskDescription taskDescription = new ActivityManager.TaskDescription(label,
+                    BitmapFactory.decodeResource(getResources(), iconRes),
                     ContextCompat.getColor(this, primaryColorRes));
             setTaskDescription(taskDescription);
         }
