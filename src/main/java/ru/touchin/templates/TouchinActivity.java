@@ -22,7 +22,6 @@ package ru.touchin.templates;
 import android.app.ActivityManager;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.ColorRes;
