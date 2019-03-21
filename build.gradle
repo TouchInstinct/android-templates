@@ -19,34 +19,41 @@ repositories {
 }
 
 dependencies {
-    api project(path: ':libraries:components')
+    implementation project(path: ':libraries:components')
 
-    api 'net.danlew:android.joda:2.9.9'
-    api 'com.android.support:multidex:1.0.3'
-
-    api "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion"
-    api "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
-
+    //noinspection NewerVersionAvailable, GradleDependency
+    compileOnly "net.danlew:android.joda:$jodaVersion"
+    //noinspection NewerVersionAvailable, GradleDependency
+    compileOnly "com.android.support:multidex:$multidexVersion"
+    //noinspection NewerVersionAvailable, GradleDependency
+    compileOnly "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion"
+    //noinspection NewerVersionAvailable, GradleDependency
+    compileOnly "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
+    //noinspection NewerVersionAvailable, GradleDependency
     compileOnly "com.android.support:recyclerview-v7:$supportLibraryVersion"
+    //noinspection NewerVersionAvailable, GradleDependency
     compileOnly "com.android.support:appcompat-v7:$supportLibraryVersion"
-
-    compileOnly 'com.squareup.retrofit2:retrofit:2.3.0'
-
-    compileOnly 'com.facebook.fresco:fresco:1.5.0'
-    compileOnly 'ru.touchin:logansquare:1.4.3'
-
+    //noinspection NewerVersionAvailable, GradleDependency
+    compileOnly "com.squareup.retrofit2:retrofit:$retrofitVersion"
+    //noinspection NewerVersionAvailable, GradleDependency
+    compileOnly "com.facebook.fresco:fresco:$frescoVersion"
+    //noinspection NewerVersionAvailable, GradleDependency
+    compileOnly "ru.touchin:logansquare:$touchinLogansquareVersion"
+    //noinspection NewerVersionAvailable, GradleDependency
     compileOnly 'com.scottyab:aes-crypto:0.0.4'
 
     // don't use latest(1.0 and above)  because they don't support Socket.IO server 1.x version
-    //noinspection NewerVersionAvailable
-    compileOnly('io.socket:socket.io-client:0.9.0') {
+    //noinspection NewerVersionAvailable, GradleDependency
+    compileOnly("io.socket:socket.io-client:$socketIoClientVersion") {
         exclude group: 'org.json', module: 'json'
     }
 
-    compileOnly('com.crashlytics.sdk.android:crashlytics:2.8.0@aar') {
+    //noinspection NewerVersionAvailable, GradleDependency
+    compileOnly("com.crashlytics.sdk.android:crashlytics:$crashlyticsVersion") {
         transitive = true
     }
 
-    compileOnly 'com.facebook.stetho:stetho:1.5.0'
+    //noinspection NewerVersionAvailable, GradleDependency
+    compileOnly "com.facebook.stetho:stetho:$stethoVersion"
 
 }
