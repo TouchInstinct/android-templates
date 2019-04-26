@@ -39,8 +39,6 @@ import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.internal.functions.Functions;
 import io.reactivex.subjects.BehaviorSubject;
-import ru.touchin.roboswag.components.navigation.activities.ViewControllerActivity;
-import ru.touchin.roboswag.components.utils.Logic;
 import ru.touchin.roboswag.components.utils.UiUtils;
 import ru.touchin.roboswag.core.log.Lc;
 import ru.touchin.roboswag.core.utils.ServiceBinder;
@@ -49,47 +47,19 @@ import ru.touchin.roboswag.core.utils.ShouldNotHappenException;
 /**
  * Created by Gavriil Sitnikov on 10/01/17.
  * Base class of service to extends for Touch Instinct related projects.
- * It contains {@link Logic} and could bind to it through {@link #untilDestroy(Observable)} methods.
- *
- * @param <TLogic> Type of application's {@link Logic}.
  */
-public abstract class TouchinService<TLogic extends Logic> extends Service {
+public abstract class TouchinService extends Service {
 
-    //it is needed to hold strong reference to logic
-    private TLogic reference;
     @NonNull
     private final Handler postHandler = new Handler();
     @NonNull
     private final BehaviorSubject<Boolean> isCreatedSubject = BehaviorSubject.create();
-
-    /**
-     * It should return specific class where all logic will be.
-     *
-     * @return Returns class of specific {@link Logic}.
-     */
-    @NonNull
-    protected abstract Class<TLogic> getLogicClass();
 
     @Override
     public void onCreate() {
         super.onCreate();
         UiUtils.UI_LIFECYCLE_LC_GROUP.i(Lc.getCodePoint(this));
         postHandler.post(() -> isCreatedSubject.onNext(true));
-    }
-
-    /**
-     * Returns (and creates if needed) application's logic.
-     *
-     * @return Object which represents application's logic.
-     */
-    @NonNull
-    protected TLogic getLogic() {
-        synchronized (ViewControllerActivity.class) {
-            if (reference == null) {
-                reference = Logic.getInstance(this, getLogicClass());
-            }
-        }
-        return reference;
     }
 
     @SuppressWarnings("CPD-START")
