@@ -19,7 +19,7 @@
 
 package ru.touchin.templates.logansquare;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.bluelinelabs.logansquare.ConverterUtils;
 import com.bluelinelabs.logansquare.LoganSquare;

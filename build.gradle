@@ -21,14 +21,14 @@ dependencies {
     api project(path: ':libraries:components')
 
     api 'net.danlew:android.joda:2.9.9'
-    api 'com.android.support:multidex:1.0.2'
+    api 'androidx.multidex:multidex:2.0.1'
     api "io.reactivex:rxandroid:$rxAndroidVersion"
     api "io.reactivex:rxjava:$rxJavaVersion"
 
-    compileOnly "com.android.support:appcompat-v7:$supportLibraryVersion"
-    compileOnly "com.android.support:recyclerview-v7:$supportLibraryVersion"
+    compileOnly "androidx.appcompat:appcompat:$appcompat"
+    compileOnly "androidx.recyclerview:recyclerview:$androidx"
 
-    compileOnly 'com.squareup.retrofit2:retrofit:2.3.0'
+    compileOnly "com.squareup.retrofit2:retrofit:$retrofit"
     compileOnly('com.google.http-client:google-http-client-jackson2:1.23.0') {
         exclude(group: 'org.apache.httpcomponents', module: 'httpclient')
     }

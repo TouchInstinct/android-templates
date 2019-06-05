@@ -23,9 +23,6 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Looper;
 import android.os.StrictMode;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.multidex.MultiDex;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
@@ -37,6 +34,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.multidex.MultiDex;
 import io.fabric.sdk.android.Fabric;
 import ru.touchin.roboswag.components.adapters.ObservableCollectionAdapter;
 import ru.touchin.roboswag.components.navigation.fragments.ViewControllerFragment;
